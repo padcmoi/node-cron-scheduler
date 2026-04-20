@@ -1,0 +1,62 @@
+{
+  "name": "@naskot/node-cron-scheduler",
+  "version": "0.1.0",
+  "description": "A tiny framework-agnostic cron scheduler for Node.js with auto job loading from a directory.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/padcmoi/node-cron-scheduler"
+  },
+  "homepage": "https://github.com/padcmoi/node-cron-scheduler",
+  "bugs": {
+    "url": "https://github.com/padcmoi/node-cron-scheduler/issues"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "test": "vitest run",
+    "dev:test": "vitest",
+    "check": "tsc --noEmit",
+    "prepublishOnly": "npm run check && npm run test && npm run build",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "cron",
+    "scheduler",
+    "jobs",
+    "task",
+    "node"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.6.0",
+    "eslint": "^10.2.1",
+    "prettier": "^3.8.3",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.2",
+    "vitest": "^3.2.4"
+  }
+}
