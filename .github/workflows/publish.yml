@@ -70,15 +70,36 @@ jobs:
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
       - run: npm run build
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
-      - name: Publish package (token or OIDC fallback)
+      - name: Publish package (token then OIDC fallback)
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
         run: |
-          if [ -n "${NPM_TOKEN}" ]; then
-            echo "Publishing with NPM_TOKEN"
-            npm publish --access public
-          else
-            echo "NPM_TOKEN missing, trying Trusted Publishing (OIDC)"
+          publish_with_token() {
+            NODE_AUTH_TOKEN="${NPM_TOKEN}" npm publish --access public
+          }
+
+          publish_with_oidc() {
+            unset NODE_AUTH_TOKEN
             npm publish --provenance --access public
+          }
+
+          if [ -n "${NPM_TOKEN}" ]; then
+            echo "Attempt 1/2: publishing with NPM_TOKEN"
+            if publish_with_token; then
+              exit 0
+            fi
+            echo "NPM_TOKEN publish failed, attempting OIDC fallback"
+            if publish_with_oidc; then
+              exit 0
+            fi
+            echo "Both publish methods failed."
+            echo "Fix: verify NPM_TOKEN rights on @naskot and/or configure npm Trusted Publisher for this repo/workflow."
+            exit 1
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+
+          echo "NPM_TOKEN missing, attempting OIDC publish"
+          if publish_with_oidc; then
+            exit 0
+          fi
+          echo "OIDC publish failed."
+          echo "Fix: configure npm Trusted Publisher for @naskot/node-cron-scheduler or add NPM_TOKEN secret."
+          exit 1
