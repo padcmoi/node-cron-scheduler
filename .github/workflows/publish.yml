@@ -70,16 +70,15 @@ jobs:
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
       - run: npm run build
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
-      - name: Validate npm token
+      - name: Publish package (token or OIDC fallback)
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
         run: |
-          if [ -z "${NPM_TOKEN}" ]; then
-            echo "NPM_TOKEN is missing. Add it in GitHub: Settings > Secrets and variables > Actions."
-            exit 1
+          if [ -n "${NPM_TOKEN}" ]; then
+            echo "Publishing with NPM_TOKEN"
+            npm publish --access public
+          else
+            echo "NPM_TOKEN missing, trying Trusted Publishing (OIDC)"
+            npm publish --provenance --access public
           fi
-
-      - name: Publish package
-        if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
-        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
