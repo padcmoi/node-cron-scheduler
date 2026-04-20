@@ -27,6 +27,9 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Clean legacy npm config
+        run: npm config delete always-auth || true
+
       - name: Validate semver tag
         id: tag
         run: |
@@ -66,5 +69,12 @@ jobs:
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
       - run: npm run build
         if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
-      - run: npm publish --access public
-        if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true'
+      - name: Publish with NPM token
+        if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true' && secrets.NPM_TOKEN != ''
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish with Trusted Publishing (OIDC)
+        if: steps.tag.outputs.is_semver == 'true' && steps.publish_state.outputs.already_published != 'true' && secrets.NPM_TOKEN == ''
+        run: npm publish --provenance --access public
