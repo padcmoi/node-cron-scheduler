@@ -21,6 +21,8 @@ Example tree in your API project:
 
 ```txt
 src/
+  services/
+    cron.service.ts
   cron/
     jobs/
       audits-purge.job.ts
@@ -48,14 +50,12 @@ export default mod;
 ### 2) Wire it in your `*.service.ts`
 
 ```ts
-// src/cron/index.ts
+// src/services/cron.service.ts
 import { join } from "node:path";
 import { CronService } from "@naskot/node-cron-scheduler";
 
-const jobsDir = join(__dirname, "jobs");
-
 export const cronService = new CronService({
-  jobsDir, // same pattern as: require(`./jobs/${file}`)
+  jobsDir: join(__dirname, "../cron/jobs"),
   recursive: false,
   missingDirectoryBehavior: "warn",
   logger: {
@@ -64,20 +64,12 @@ export const cronService = new CronService({
     error: (message, meta) => console.error(message, meta),
   },
 });
-
-export async function startCron() {
-  return cronService.start();
-}
-
-export function stopCron() {
-  cronService.stop();
-}
 ```
 
 ### 3) Start from bootstrap/init
 
 ```ts
-await startCron();
+await cronService.start();
 ```
 
 ## Typed Helpers
@@ -87,10 +79,7 @@ Use helpers to build lines safely:
 ```ts
 import { everyHours, hh, mm } from "@naskot/node-cron-scheduler";
 
-const lines = [
-  { mm: mm(0), hh: hh(8), jj: "*", MMM: "*", JJJ: "*" },
-  ...everyHours(6, { mm: 0, jj: "*", MMM: "*", JJJ: "*" }),
-];
+const lines = [{ mm: mm(0), hh: hh(8), jj: "*", MMM: "*", JJJ: "*" }, ...everyHours(6, { mm: 0, jj: "*", MMM: "*", JJJ: "*" })];
 ```
 
 ## API
@@ -102,6 +91,6 @@ const lines = [
 ## Notes
 
 - The scheduler uses the Node.js process timezone.
-- Recommended pattern: keep the cron bootstrap file next to `jobs/`, then use `join(__dirname, "jobs")`.
+- Recommended pattern: keep the service in `src/services/cron.service.ts` and jobs in `src/cron/jobs`, then use `join(__dirname, "../cron/jobs")`.
 - Jobs are loaded with `require`, exactly in the original starter template spirit.
 - Keep business logic in dedicated domain services; jobs should orchestrate calls only.
