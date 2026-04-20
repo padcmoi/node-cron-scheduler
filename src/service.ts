@@ -1,6 +1,6 @@
 import { loadCronJobsFromDirectory } from "./load-jobs";
 import { CronRunner } from "./scheduler";
-import type { CronLoadJobsResult, CronServiceOptions } from "./types";
+import type { CronServiceOptions } from "./types";
 
 export class CronService {
   readonly runner: CronRunner;
@@ -22,7 +22,7 @@ export class CronService {
     this.logger = options.logger;
   }
 
-  async loadJobs(force = false): Promise<CronLoadJobsResult> {
+  async loadJobs(force = false) {
     if (force) {
       for (const taskId of this.runner.listTaskIds()) {
         this.runner.unregister(taskId);

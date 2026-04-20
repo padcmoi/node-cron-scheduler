@@ -44,11 +44,11 @@ export default [
         },
       ],
       // Disallow any explicit use of `any`
-      "@typescript-eslint/no-explicit-any": "off", // error
-      // Temporary relaxed unsafe-any usage during migration
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-explicit-any": "error", // error
+      // unsafe-any usage
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
 
       // Warn on usage of `!` (non-null assertion)
       "@typescript-eslint/no-non-null-assertion": "warn",
@@ -64,7 +64,7 @@ export default [
       // Do not enforce explicit function return types
       "@typescript-eslint/explicit-function-return-type": "off",
       "no-restricted-syntax": [
-        "off",
+        "error",
         {
           selector: ":matches(FunctionDeclaration, FunctionExpression, ArrowFunctionExpression)[returnType]",
           message: "Avoid explicit return type annotations; prefer inference.",

@@ -1,15 +1,4 @@
-import type {
-  BaseNoDay,
-  BaseNoHour,
-  BaseNoMinute,
-  CronLine,
-  DayOfMonth,
-  DayOfWeek,
-  Hour,
-  Minute,
-  Month,
-  NumericToken,
-} from "./types";
+import type { BaseNoDay, BaseNoHour, BaseNoMinute, CronLine, DayOfMonth, DayOfWeek, Hour, Minute, Month, NumericToken } from "./types";
 
 const MONTHS: Record<Exclude<Month, "*">, number> = {
   january: 1,
@@ -67,17 +56,17 @@ function assertIntInRange(name: string, v: number, min: number, max: number) {
   }
 }
 
-export function mm(v: number): Minute {
+export function mm(v: number) {
   assertIntInRange("minute", v, 0, 59);
   return v as Minute;
 }
 
-export function hh(v: number): Hour {
+export function hh(v: number) {
   assertIntInRange("hour", v, 0, 23);
   return v as Hour;
 }
 
-export function jj(v: number): DayOfMonth {
+export function jj(v: number) {
   assertIntInRange("dayOfMonth", v, 1, 31);
   return v as DayOfMonth;
 }

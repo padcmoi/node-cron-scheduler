@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [Unreleased] - yyyy-mm-dd
 
 - Fix: enforce `require`-based local job loading pattern aligned with the starter-template behavior.
 - Docs: clarify service location (`src/services/cron.service.ts`) and jobs location (`src/cron/jobs`) with `jobsDir: join(__dirname, "../cron/jobs")`.

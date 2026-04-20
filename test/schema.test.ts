@@ -18,13 +18,23 @@ describe("schema helpers", () => {
   });
 
   it("expands everyMinutes/everyHours/everyDaysOfMonth", () => {
-    const linesByMinute = everyMinutes(15, { hh: 8, jj: "*", MMM: "*", JJJ: "*" });
+    const linesByMinute = everyMinutes(15, {
+      hh: 8,
+      jj: "*",
+      MMM: "*",
+      JJJ: "*",
+    });
     expect(linesByMinute.map((line) => line.mm)).toEqual([0, 15, 30, 45]);
 
     const linesByHour = everyHours(6, { mm: 0, jj: "*", MMM: "*", JJJ: "*" });
     expect(linesByHour.map((line) => line.hh)).toEqual([0, 6, 12, 18]);
 
-    const linesByDay = everyDaysOfMonth(10, { mm: 0, hh: 8, MMM: "*", JJJ: "*" });
+    const linesByDay = everyDaysOfMonth(10, {
+      mm: 0,
+      hh: 8,
+      MMM: "*",
+      JJJ: "*",
+    });
     expect(linesByDay.map((line) => line.jj)).toEqual([1, 11, 21, 31]);
   });
 });
