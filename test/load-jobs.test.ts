@@ -25,23 +25,23 @@ describe("loadCronJobsFromDirectory", () => {
     const jobsDir = await createTempJobsDir();
 
     await writeFile(
-      join(jobsDir, "alpha.mjs"),
-      `export default { config: { atBoot: false, lines: [{ mm: 0, hh: 8, jj: '*', MMM: '*', JJJ: '*' }] }, run: () => {} };\n`
+      join(jobsDir, "alpha.cjs"),
+      `module.exports = { config: { atBoot: false, lines: [{ mm: 0, hh: 8, jj: '*', MMM: '*', JJJ: '*' }] }, run: () => {} };\n`
     );
 
-    await writeFile(join(jobsDir, "invalid.mjs"), `export const nope = true;\n`);
+    await writeFile(join(jobsDir, "invalid.cjs"), `module.exports = { nope: true };\n`);
 
     await mkdir(join(jobsDir, "nested"));
     await writeFile(
-      join(jobsDir, "nested", "beta.mjs"),
-      `export default { config: { atBoot: true, lines: [{ mm: 30, hh: 12, jj: '*', MMM: '*', JJJ: '*' }] }, run: () => {} };\n`
+      join(jobsDir, "nested", "beta.cjs"),
+      `module.exports = { default: { config: { atBoot: true, lines: [{ mm: 30, hh: 12, jj: '*', MMM: '*', JJJ: '*' }] }, run: () => {} } };\n`
     );
 
     const runner = new CronRunner();
     const result = await loadCronJobsFromDirectory(runner, {
       jobsDir,
       recursive: true,
-      fileExtensions: [".mjs"],
+      fileExtensions: [".cjs"],
     });
 
     expect(result.loaded).toBe(2);
@@ -76,13 +76,13 @@ describe("CronService", () => {
     const jobsDir = await createTempJobsDir();
 
     await writeFile(
-      join(jobsDir, "cleanup.mjs"),
-      `export default { config: { atBoot: false, lines: [{ mm: 0, hh: '*', jj: '*', MMM: '*', JJJ: '*' }] }, run: () => {} };\n`
+      join(jobsDir, "cleanup.cjs"),
+      `module.exports = { config: { atBoot: false, lines: [{ mm: 0, hh: '*', jj: '*', MMM: '*', JJJ: '*' }] }, run: () => {} };\n`
     );
 
     const service = new CronService({
       jobsDir,
-      fileExtensions: [".mjs"],
+      fileExtensions: [".cjs"],
       missingDirectoryBehavior: "error",
     });
 

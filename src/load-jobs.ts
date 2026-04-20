@@ -1,11 +1,11 @@
 import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
-import { extname, join, relative } from "node:path";
-import { pathToFileURL } from "node:url";
+import { createRequire } from "node:module";
+import { extname, join, relative, resolve } from "node:path";
 import type { CronRunner } from "./scheduler";
 import type { CronLoadJobsOptions, CronLoadJobsResult, CronModule } from "./types";
 
-const DEFAULT_EXTENSIONS = [".js", ".mjs", ".cjs", ".ts", ".mts", ".cts"];
+const DEFAULT_EXTENSIONS = [".js", ".cjs", ".ts", ".cts"];
 
 function normalizeExtensions(fileExtensions: string[] | undefined) {
   const source = fileExtensions && fileExtensions.length > 0 ? fileExtensions : DEFAULT_EXTENSIONS;
@@ -76,8 +76,10 @@ export async function loadCronJobsFromDirectory(runner: CronRunner, options: Cro
   const recursive = options.recursive ?? false;
   const missingDirectoryBehavior = options.missingDirectoryBehavior ?? "warn";
   const logger = options.logger;
+  const resolvedJobsDir = resolve(options.jobsDir);
+  const loadJobWithRequire = createRequire(join(resolvedJobsDir, "__cron_loader__.cjs"));
 
-  if (!existsSync(options.jobsDir)) {
+  if (!existsSync(resolvedJobsDir)) {
     const message = `[CRON] jobs directory not found: ${options.jobsDir}`;
 
     if (missingDirectoryBehavior === "error") {
@@ -91,7 +93,7 @@ export async function loadCronJobsFromDirectory(runner: CronRunner, options: Cro
     return { loaded: 0, skipped: 0, files: [] };
   }
 
-  const files = await listJobFiles(options.jobsDir, recursive, extensions);
+  const files = await listJobFiles(resolvedJobsDir, recursive, extensions);
   if (files.length === 0) {
     return { loaded: 0, skipped: 0, files: [] };
   }
@@ -102,12 +104,13 @@ export async function loadCronJobsFromDirectory(runner: CronRunner, options: Cro
 
   for (const filePath of files) {
     let imported: unknown;
+    const relativeFile = relative(resolvedJobsDir, filePath).split("\\").join("/");
 
     try {
-      imported = await import(pathToFileURL(filePath).href);
+      imported = loadJobWithRequire(`./${relativeFile}`);
     } catch (error) {
       skipped += 1;
-      logger?.warn?.("[CRON] failed to import job file", { filePath, error });
+      logger?.warn?.("[CRON] failed to require job file", { filePath, error });
       continue;
     }
 
@@ -118,7 +121,7 @@ export async function loadCronJobsFromDirectory(runner: CronRunner, options: Cro
       continue;
     }
 
-    const taskId = toTaskId(options.jobsDir, filePath, extensions);
+    const taskId = toTaskId(resolvedJobsDir, filePath, extensions);
     runner.register(taskId, cronModule);
 
     loaded += 1;

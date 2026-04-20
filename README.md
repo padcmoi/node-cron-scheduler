@@ -48,12 +48,14 @@ export default mod;
 ### 2) Wire it in your `*.service.ts`
 
 ```ts
-// src/services/cron.service.ts
+// src/cron/index.ts
 import { join } from "node:path";
 import { CronService } from "@naskot/node-cron-scheduler";
 
+const jobsDir = join(__dirname, "jobs");
+
 export const cronService = new CronService({
-  jobsDir: join(process.cwd(), "dist", "cron", "jobs"),
+  jobsDir, // same pattern as: require(`./jobs/${file}`)
   recursive: false,
   missingDirectoryBehavior: "warn",
   logger: {
@@ -94,11 +96,12 @@ const lines = [
 ## API
 
 - `CronRunner`: low-level scheduler (manual registration)
-- `loadCronJobsFromDirectory(runner, options)`: scan/import/register jobs from a folder
+- `loadCronJobsFromDirectory(runner, options)`: scan/require/register jobs from a folder
 - `CronService`: high-level wrapper that receives `jobsDir` and auto-loads on `start()`
 
 ## Notes
 
 - The scheduler uses the Node.js process timezone.
-- `jobsDir` should usually target built JS files in production (`dist/...`).
+- Recommended pattern: keep the cron bootstrap file next to `jobs/`, then use `join(__dirname, "jobs")`.
+- Jobs are loaded with `require`, exactly in the original starter template spirit.
 - Keep business logic in dedicated domain services; jobs should orchestrate calls only.
