@@ -1,10 +1,10 @@
 # node-cron-scheduler
 
-Framework-agnostic cron scheduler for Node.js.
+Node.js cron scheduler.
 
 - Linux-like minute scheduling (`mm hh jj MMM JJJ`)
 - In-process runner
-- Job auto-loading from a directory you provide
+- Auto-loading jobs from your own directory
 - No Express dependency
 
 ## Install
@@ -12,6 +12,10 @@ Framework-agnostic cron scheduler for Node.js.
 ```bash
 npm install @naskot/node-cron-scheduler
 ```
+
+## Official Documentation
+
+- How-to usage + full API reference: [docs/helpers.md](./docs/helpers.md)
 
 ## Quick Start
 
@@ -47,10 +51,9 @@ const mod: CronModule = {
 export default mod;
 ```
 
-### 2) Wire it in your `*.service.ts`
+### 2) Write it in your `src/services/cron.service.ts`
 
 ```ts
-// src/services/cron.service.ts
 import { join } from "node:path";
 import { CronService } from "@naskot/node-cron-scheduler";
 
@@ -74,15 +77,11 @@ Call this when your app/API is starting as a singleton.
 await cronService.start();
 ```
 
-## Typed Helpers
+### 4) Documentation
 
-Use helpers to build lines safely:
+How-to guide (usage documentation):
 
-```ts
-import { everyHours, hh, mm } from "@naskot/node-cron-scheduler";
-
-const lines = [{ mm: mm(0), hh: hh(8), jj: "*", MMM: "*", JJJ: "*" }, ...everyHours(6, { mm: 0, jj: "*", MMM: "*", JJJ: "*" })];
-```
+- [docs/helpers.md](./docs/helpers.md) - complete guide on how to use helpers and APIs.
 
 ## API
 
