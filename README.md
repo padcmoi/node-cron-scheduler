@@ -68,6 +68,8 @@ export const cronService = new CronService({
 
 ### 3) Start from bootstrap/init
 
+Call this when your app/API is starting as a singleton.
+
 ```ts
 await cronService.start();
 ```
