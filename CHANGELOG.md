@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.2] - 2026-04-21
+
+- fix(registry): restore npm package visibility
+
 ## [1.0.1] - 2026-04-21
 
 - Fix CI: align npm publish workflow with `node-hmac-auth` (tag-driven GitHub Actions publish path).
